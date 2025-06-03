@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Web Music - Temukan Lagu Indonesia</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff4d4d;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-effect: rgba(255, 255, 255, 0.15);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            position: relative;
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+            z-index: 10;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, white, #ffd6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem auto;
+            max-width: 700px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .search-wrapper {
+            width: 100%;
+            position: relative;
+            display: flex;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .search-wrapper:focus-within {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        #search-input {
+            width: 100%;
+            padding: 1.2rem 2rem;
+            border: none;
+            font-size: 1.1rem;
+            outline: none;
+            background: var(--card-bg);
+            color: var(--dark);
+        }
+        
+        #search-button {
+            padding: 0 2rem;
+            background: linear-gradient(to right, var(--accent), #ff7676);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        #search-button:hover {
+            background: linear-gradient(to right, #ff3838, var(--accent));
+        }
+        
+        .main-content {
+            position: relative;
+            z-index: 5;
+        }
+        
+        .songs-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .song-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .song-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .song-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+        
+        .song-info {
+            padding: 1.8rem;
+            position: relative;
+        }
+        
+        .song-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .song-artist {
+            color: var(--secondary);
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .song-artist i {
+            font-size: 0.9rem;
+        }
+        
+        .song-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px dashed rgba(0, 0, 0, 0.1);
+        }
+        
+        .song-year {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .song-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--gray);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .action-btn:hover {
+            background: var(--secondary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 4rem;
+            color: white;
+            font-size: 1.2rem;
+            background: var(--glass-effect);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 5rem;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .floating-bg {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(106, 17, 203, 0.2) 0%, rgba(37, 117, 252, 0.1) 70%, transparent 100%);
+            z-index: 1;
+        }
+        
+        .bg-1 {
+            top: -100px;
+            left: -100px;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .bg-2 {
+            bottom: -150px;
+            right: -100px;
+            animation: float 18s infinite ease-in-out reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            50% {
+                transform: translate(30px, 50px);
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
+            }
+            
+            .search-container {
+                margin: 1.5rem auto;
+            }
+            
+            #search-input {
+                padding: 1rem 1.5rem;
+            }
+            
+            #search-button {
+                padding: 0 1.5rem;
+            }
+            
+            .songs-container {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .search-wrapper {
+                flex-direction: column;
+                border-radius: 15px;
+            }
+            
+            #search-input {
+                border-radius: 15px 15px 0 0;
+            }
+            
+            #search-button {
+                border-radius: 0 0 15px 15px;
+                padding: 0.8rem;
+                justify-content: center;
+            }
+            
+            .song-card {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating background elements -->
+    <div class="floating-bg bg-1"></div>
+    <div class="floating-bg bg-2"></div>
+    
+    <header>
+        <div class="container header-content">
+            <h1>App Web Music</h1>
+            <p class="tagline">Temukan lagu-lagu terbaik dari seluruh pelosok Indonesia</p>
+        </div>
+    </header>
+    
+    <div class="container main-content">
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="search-input" placeholder="Cari lagu, artis, atau lirik..." autocomplete="off">
+                <button id="search-button">
+                    <i class="fas fa-search"></i> Cari
+                </button>
+            </div>
+        </div>
+        
+        <div class="songs-container" id="songs-container">
+            <!-- Daftar lagu akan muncul di sini -->
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 App Web Music | Dibuat dengan <i class="fas fa-heart" style="color: var(--accent);"></i> untuk musik Indonesia</p>
+    </footer>
+
+    <script>
+        const songs = [
+            {
+                title: "Takkan Terganti",
+                artist: "Marcell Siahaan",
+                year: 2003,
+                lyrics: "Ku takkan bisa mencintai lagi...",
+                popularity: 95,
+                duration: "4:12"
+            },
+            {
+                title: "Kangen",
+                artist: "Dewa 19",
+                year: 1992,
+                lyrics: "Kangen aku kangen...",
+                popularity: 98,
+                duration: "4:05"
+            },
+            {
+                title: "Cinta Ini Membunuhku",
+                artist: "D'Masiv",
+                year: 2009,
+                lyrics: "Aku terjatuh dan terjatuh lagi...",
+                popularity: 92,
+                duration: "3:45"
+            },
+            {
+                title: "Mantan Terindah",
+                artist: "Kahitna",
+                year: 2015,
+                lyrics: "Kau memang mantan terindah...",
+                popularity: 88,
+                duration: "4:20"
+            },
+            {
+                title: "Aku Yang Tersakiti",
+                artist: "Judika",
+                year: 2013,
+                lyrics: "Aku yang tersakiti...",
+                popularity: 97,
+                duration: "4:15"
+            },
+            {
+                title: "Cinta Sampai Mati",
+                artist: "D'Masiv",
+                year: 2008,
+                lyrics: "Ku ingin kau tahu...",
+                popularity: 94,
+                duration: "3:58"
+            },
+            {
+                title: "Perahu Kertas",
+                artist: "Maudy Ayunda",
+                year: 2012,
+                lyrics: "Perahu kertas yang kau buat...",
+                popularity: 90,
+                duration: "4:02"
+            },
+            {
+                title: "Yang Terdalam",
+                artist: "Noah",
+                year: 2012,
+                lyrics: "Kau datang lagi...",
+                popularity: 93,
+                duration: "4:25"
+            },
+            {
+                title: "Separuh Aku",
+                artist: "Noah",
+                year: 2012,
+                lyrics: "Dengarlah sayang...",
+                popularity: 96,
+                duration: "4:10"
+            },
+            {
+                title: "Laskar Pelangi",
+                artist: "Nidji",
+                year: 2008,
+                lyrics: "Mimpi adalah kunci...",
+                popularity: 99,
+                duration: "4:30"
+            },
+            {
+                title: "Rindu Ini",
+                artist: "Agnez Mo",
+                year: 2003,
+                lyrics: "Rindu ini berat...",
+                popularity: 85,
+                duration: "3:52"
+            },
+            {
+                title: "Andai Aku Bisa",
+                artist: "Chrisye",
+                year: 1991,
+                lyrics: "Andai aku bisa terbang...",
+                popularity: 97,
+                duration: "5:12"
+            },
+            {
+                title: "Bintang di Surga",
+                artist: "Peterpan",
+                year: 2004,
+                lyrics: "Bintang di surga...",
+                popularity: 98,
+                duration: "4:45"
+            },
+            {
+                title: "Cobalah Mengerti",
+                artist: "Noah",
+                year: 2014,
+                lyrics: "Cobalah mengerti...",
+                popularity: 89,
+                duration: "3:58"
+            },
+            {
+                title: "Dia",
+                artist: "Anji",
+                year: 2015,
+                lyrics: "Dia yang pernah ada...",
+                popularity: 87,
+                duration: "4:15"
+            },
+            {
+                title: "Hampa",
+                artist: "Ari Lasso",
+                year: 2003,
+                lyrics: "Ku terjaga di tengah malam...",
+                popularity: 94,
+                duration: "4:22"
+            },
+            {
+                title: "Jangan Menyerah",
+                artist: "D'Masiv",
+                year: 2009,
+                lyrics: "Jangan menyerah...",
+                popularity: 95,
+                duration: "4:05"
+            },
+            {
+                title: "Kau Adalah",
+                artist: "Isyana Sarasvati",
+                year: 2015,
+                lyrics: "Kau adalah...",
+                popularity: 91,
+                duration: "3:45"
+            },
+            {
+                title: "Lagu Cinta",
+                artist: "Dewa 19",
+                year: 1999,
+                lyrics: "Ini lagu cinta...",
+                popularity: 96,
+                duration: "4:18"
+            },
+            {
+                title: "Mengejar Matahari",
+                artist: "Ari Lasso",
+                year: 2003,
+                lyrics: "Ku terus berlari...",
+                popularity: 90,
+                duration: "4:32"
+            }
+        ];
+
+        // Function to display all songs with sorting by popularity
+        function displayAllSongs() {
+            const container = document.getElementById('songs-container');
+            container.innerHTML = '';
+            
+            // Sort songs by popularity (descending)
+            const sortedSongs = [...songs].sort((a, b) => b.popularity - a.popularity);
+            
+            sortedSongs.forEach(song => {
+                const songCard = createSongCard(song);
+                container.appendChild(songCard);
+            });
+        }
+
+        // Function to create a song card element
+        function createSongCard(song) {
+            const songCard = document.createElement('div');
+            songCard.className = 'song-card';
+            
+            // Generate random color gradient for each card
+            const hue1 = Math.floor(Math.random() * 360);
+            const hue2 = (hue1 + 30 + Math.floor(Math.random() * 60)) % 360;
+            
+            songCard.innerHTML = `
+                <div class="song-info">
+                    <div class="song-title">${song.title}</div>
+                    <div class="song-artist">
+                        <i class="fas fa-user"></i> ${song.artist}
+                    </div>
+                    <div class="song-meta">
+                        <span class="song-year">${song.year}</span>
+                        <div class="song-actions">
+                            <button class="action-btn" title="Putar">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="action-btn" title="Favorit">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <button class="action-btn" title="Lirik">
+                                <i class="fas fa-music"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Set the gradient for the top border
+            songCard.style.setProperty('--primary', `hsl(${hue1}, 70%, 50%)`);
+            songCard.style.setProperty('--secondary', `hsl(${hue2}, 70%, 50%)`);
+            
+            return songCard;
+        }
+
+        // Function to search songs
+        function searchSongs() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const container = document.getElementById('songs-container');
+            container.innerHTML = '';
+            
+            const filteredSongs = songs.filter(song => 
+                song.title.toLowerCase().includes(searchTerm) || 
+                song.artist.toLowerCase().includes(searchTerm) ||
+                song.lyrics.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredSongs.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <p>Tidak ada hasil ditemukan untuk "${searchTerm}"</p>
+                        <small>Coba kata kunci lain atau periksa ejaan</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredSongs.forEach(song => {
+                const songCard = createSongCard(song);
+                container.appendChild(songCard);
+            });
+        }
+
+        // Event listeners
+        document.getElementById('search-button').addEventListener('click', searchSongs);
+        
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            // Add debounce to prevent rapid firing
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                if (this.value.trim() === '') {
+                    displayAllSongs();
+                } else {
+                    searchSongs();
+                }
+            }, 300);
+        });
+        
+        document.getElementById('search-input').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                searchSongs();
+            }
+        });
+
+        // Initialize with all songs displayed
+        window.addEventListener('load', displayAllSongs);
+    </script>
+</body>
+</html>
